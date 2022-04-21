@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
-const app = express();
 const util = require('util');
 const fs = require('fs');
+var uuidv1 = require('uuidv1');
 
+
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 
@@ -14,7 +16,7 @@ app.use(express.static('public'));
 
 app.listen(PORT, ()=> console.log(`Listening on PORT: http://localhost:${PORT}`));
 
-app.get('/', (req, res) =>
+app.get('*', (req, res) =>
   res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
@@ -23,22 +25,19 @@ app.get('/notes', (req, res)=>{
 });
 
 app.get('/api/notes', (req, res)=>{
-    console.info(`${req.method} request received for adding note`);
-    readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
+  const getNote = fs.readFileSync(path.join(__dirname, '/db/db.json'), "utf-8");
+  const parseNote = JSON.parse(getNote);
+  res.json(parseNote);
+  console.info(`${req.method} request received for adding note`);
 });
 
 app.post('/api/notes', (req, res)=>{
-    console.log(`${req.method} request received to save a note`)
-    const { title, text } = req.body;
-    if (req.body) {
-        const newNote = {
-          title,
-          text,
-        };
-    
-        readAndAppend(newNote, './db/db.json');
-        res.json(`Note added successfully`);
-      } else {
-        res.error('Error in adding Note');
-      }
+  const saveNote = fs.readFileSync(path.join(__dirname, '/db/db.json'), "utf-8");
+  const parseNote = JSON.parse(saveNote);
+  req.body.id = uuidv1();
+  parseNote.push(req.body)
+
+  fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(parseNote), "utf-8");
+  res.json();
+  console.log(`${req.method} request received to save a note`);
 });
