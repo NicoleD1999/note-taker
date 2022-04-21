@@ -14,11 +14,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
 
-app.listen(PORT, ()=> console.log(`Listening on PORT: http://localhost:${PORT}`));
 
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
-);
+
 
 app.get('/notes', (req, res)=>{
     res.sendFile(path.join(__dirname,'/public/notes.html'))
@@ -41,3 +38,9 @@ app.post('/api/notes', (req, res)=>{
   res.json();
   console.log(`${req.method} request received to save a note`);
 });
+
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/index.html'))
+);
+
+app.listen(PORT, ()=> console.log(`Listening on PORT: http://localhost:${PORT}`));
